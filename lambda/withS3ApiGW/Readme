@@ -1,0 +1,24 @@
+This directory contains sample code to set up a web site using AWS S3 and lambda
+
+(1) Defined a bucket in AWS account
+    account : Uttara's Personal AWS account
+    ut-myserverlesswebsite
+    this bucket in Properties Tab is enabled for Static WebSite Hosting,
+        with index.html and error.html => these files are in this repo udemy/lambda/withS3ApiGW and also in this S3 bucket
+    EndPoint :  http://ut-myserverlesswebsite.s3-website-us-east-1.amazonaws.com
+
+(2) index.html
+    this is rendered when you go to this web site
+    the click button invokes a lambda function
+
+(3) Lambda function created in AWS using console, using create from scratch option
+    Name : myS3APIGWLambda
+    What is important is that in the configuration, Handler must be defined correctly
+    When you copy paste the code for python, the file name for handler is index, but you must
+    specify the function name exactly as the function name defined in python code
+    so my python code was as in file lambdaS3withAPIGW.py
+    lambda_handler
+    do Handler must be defined as index.lambda_handler
+    AWS automatically created a API Gateway for me when I selected API gateway as the trigger
+    API Gateway: k47ixwgmhh
+    https://k47ixwgmhh.execute-api.us-east-1.amazonaws.com/prod/myS3APIGWLambda
