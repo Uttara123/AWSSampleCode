@@ -1,0 +1,52 @@
+This sample code's architecture is in the Architecture.png file
+
+(1) create a dynamo db table called posts with one primary key = id, everything else default
+
+(2) create a S3 bucket ut-test-pollywebsite  , with bucket hosting enabled
+
+(3)  create a S3 bucket ut-test-pollyaudiofiles
+
+(4) create a SNS topic named new_posts
+
+(5) create a new role , select AWS Lambda, but do not attach any policy : LambdaPostsReaderRole
+
+(6) create a custom policy called lambdapolicy and use the json file  lambdapolicy.json, cut and paste from this file
+    and put it as this custom policy's definition
+
+(7) attach this custom policy to the LambdaPostsReaderRole
+
+(8) create a new lambda function from scratch with No trigger and call it PostReader_NewPosts. the code for this is in
+    file newposts.py
+    this lambda function can add a record to the posts db table and also publish a message to SNS topic
+
+(9) create another lambda function , PostsReader_ConvertToAudio , from scratch and whose trigger is the SNS topic
+    new_posts, use the code in converttoaudio.py file . This file contains the code for the lambda function
+    this lambda function will get a postid from sns event, look up the text and voice associated with the id in
+    dynamo db and then invoke polly to convert text to audio and then place the mp3 file in S3 bucket :
+        ut-test-pollyaudiofiles
+
+(10) create one more lambda function, PostReader_GetPost , no trigger, code from getposts.py file
+
+(11) Create a API in API Gateway, call it PostReaderAPI, with 2 methods
+    GET - associate with lambda function for getposts, PostReader_GetPost
+        - enable CORS
+        - In method request define url query parameter, postId
+        - In integration request add body mapping template, in request body pass through option select , 'When there
+        are no templates defined' , type content type as application/json and paste the mapping from mappings.json
+         file
+    POST - associate with lambda function, PostReader_NewPosts
+
+    Now deploy this API by selecting deploy from action, it will create a url to access the api gw
+
+        https://euhszwr4ta.execute-api.us-east-1.amazonaws.com/dev
+
+(12) Create a bucket policy for the S3 bucket that is hosting the static website so that any object that is put in S3
+   automatically becomes public and other AWS services or anyone can get
+   get objects from it. Bucket policy can be found in the file bucketpolicypermissions.json
+    applied it to ut-test-pollywebsite
+
+(13) For the website, there is a scripts.js file , need to have right values in it
+    The variable API_ENDPOINT needs to be set to the APIGW URL created above
+        : https://euhszwr4ta.execute-api.us-east-1.amazonaws.com/dev
+    Upload index.html, styles.css and scripts.js to the S3 bucket
+    Now if you go to the S3 website  http://ut-test-pollywebsite.s3-website-us-east-1.amazonaws.com
