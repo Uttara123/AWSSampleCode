@@ -1,0 +1,26 @@
+These are notes on how you can create a RDS DB in amazon and have a web server talk to it
+
+(1) Create a RDS DB, select MySQL, all defaults. for security group,select to create a new security group
+
+(2) Edit the new security group that was created. The group will have a name 'rds-launch-wizard'
+
+    by default this new security group will have source IP as Custom and your mac or pc's IP.
+    edit that and make the source the same security group as the one that will contain your webservers
+    tip : type s in the filed and it will show you a list of security groups, select one that is also assigned
+    to webservers
+
+(3) Modify the connect.php file in this dir to contain the correct info about your db
+
+    upload this  php file   to a S3 bucket and modify the rds.sh file in this dir to contain the url
+    to this php file
+
+(4) rds.sh file contains the Advanced /User Data for your ec2 instance , to set up a web server at launch time
+
+    at the time of instantiation of ec2 instance, add this code to Advanced Data or after ec2 instance is up and
+    running, you can execute these statements as root
+
+(5) Now when you got to http://<ip of the instance >/connect.php , you will see that webserver connected to db
+
+
+
+
